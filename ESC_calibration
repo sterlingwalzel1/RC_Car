@@ -120,3 +120,6 @@ elif inp == "stop":
     stop()
 else :
     print "Thank You for not following the things I'm saying... now you gotta restart the program STUPID!!"
+
+
+#Website used: https://www.instructables.com/Driving-an-ESCBrushless-Motor-Using-Raspberry-Pi/
