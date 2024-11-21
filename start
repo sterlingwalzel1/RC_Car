@@ -1,0 +1,50 @@
+import os     
+import time   
+import RPi.GPIO as GPIO
+import sys
+
+sys.path.insert(0, '../utilities')
+import utilities
+"""
+pwm = utilities.HW_PWM(62.5)
+pwm.set_duty_cycle(0.0)
+
+GPIO.setmode(GPIO.BOARD)
+GPIO.setwarnings(False)
+PWM_Pin = 12
+
+GPIO.setup(PWM_Pin, GPIO.OUT)
+
+for i in range(0,7):
+    GPIO.output(PWM_Pin, 1)
+    time.sleep(0.0025)
+    GPIO.output(PWM_Pin, 0)
+    time.sleep(0.013)
+
+GPIO.output(PWM_Pin, 1)
+time.sleep(0.0025)
+GPIO.output(PWM_Pin, 0)
+time.sleep(0.005)
+GPIO.output(PWM_Pin, 1)
+time.sleep(0.003)
+GPIO.output(PWM_Pin, 0)
+time.sleep(0.0006)
+GPIO.output(PWM_Pin, 1)
+time.sleep(0.0037)
+GPIO.output(PWM_Pin, 0)
+time.sleep(0.00056)
+GPIO.output(PWM_Pin, 1)
+time.sleep(0.013)
+GPIO.output(PWM_Pin, 0)
+time.sleep(0.00056)
+
+pwm.set_duty_cycle(8.0)
+"""
+
+pwm = utilities.HW_PWM(62.5)
+pwm.set_duty_cycle(5.0)
+time.sleep(1)
+pwm.set_duty_cycle(10)
+time.sleep(1)
+
+pwm.set_duty_cycle(8.8)
