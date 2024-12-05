@@ -3,7 +3,7 @@ import time
 ultrasonic = DistanceSensor(echo=17, trigger=4, threshold_distance=0.5)
 try:
     while True:
-        print(ultrasonic.distance)
+        print((ultrasonic.distance-0.01661) / 0.023205)
         time.sleep(1)
 
 
