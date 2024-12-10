@@ -3,6 +3,7 @@ import time
 import sys
 import os
 import spidev
+from Camera_Detection import take_picture, detect_red, detect_yellow
 import paho.mqtt.client as mqtt
 from gpiozero import DistanceSensor
 
@@ -80,8 +81,32 @@ client.on_message = on_message
 client.connect("broker.emqx.io", 1883, 60)
 client.loop_start()
 
+
+#Distance sensor and lights
 try:
     while True:
+
+         # Capture an image and save it as "captured_image.jpg"
+        take_picture("captured_image.jpg")
+        # Read the captured image
+        image = cv2.imread("captured_image.jpg")
+        # Call the function to detect if at least 50% of the image is red
+         red_detected = detect_red(image)
+
+        # Call the function to detect if at least 50% of the image is yellow
+        yellow_detected = detect_yellow(image)
+
+        # Print the results
+         if red_detected:
+          print("At least 50% of the image is Red: True")
+         else:
+          print("At least 50% of the image is Red: False")
+
+        if yellow_detected:
+            print("At least 50% of the image is Yellow: True")
+         else:
+            print("At least 50% of the image is Yellow: False")
+
         #convert the ultrasonic numbers to inches
         front_distance = (us_front.distance - 0.01661) / 0.023205
         back_distance  = (us_back.distance - 0.01661)  / 0.023205
@@ -104,7 +129,7 @@ try:
             GPIO.output(leftFLED,  light_state)
             GPIO.output(leftBLED,  light_state)
 
-        time.sleep(0.01)
+        time.sleep(1)
   
 except KeyboardInterrupt:
     print('Got Keyboard Interrupt. Cleaning up and exiting')
