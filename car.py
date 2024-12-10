@@ -56,15 +56,17 @@ def on_message(client, userdata, msg):
     elif act <= 100:
         act = (act / 16.67) + 6
         turn.ChangeDutyCycle(act)
-        global turnSignal = act 
+        global turnSignal = act  # this is the global version of the turn
     elif (act >= 1000) and (act <= 1100):
         act = act % 1000
         speed1.ChangeDutyCycle(act) 
         speed2.ChangeDutyCycle(0) 
+        global speed = act
     elif (act >= 2000) and (act <= 2100):
         act = act % 2000
         speed1.ChangeDutyCycle(0) 
         speed2.ChangeDutyCycle(act) 
+        global speed = act
 
 
     
@@ -85,33 +87,29 @@ client.loop_start()
 #Distance sensor and lights
 try:
     while True:
-
-         # Capture an image and save it as "captured_image.jpg"
+        # Capture an image and save it as "captured_image.jpg"
         take_picture("captured_image.jpg")
+
         # Read the captured image
         image = cv2.imread("captured_image.jpg")
-        # Call the function to detect if at least 50% of the image is red
-         red_detected = detect_red(image)
 
-        # Call the function to detect if at least 50% of the image is yellow
+        # Call the function to detect if at least 50% of the image is red or yellow
+        red_detected = detect_red(image)
         yellow_detected = detect_yellow(image)
 
-        # Print the results
-         if red_detected:
-          print("At least 50% of the image is Red: True")
-         else:
-          print("At least 50% of the image is Red: False")
-
+        if red_detected:
+            speed1.set_duty_cycle(0.0) #automatic braking system
+            speed2.set_duty_cycle(0.0) 
         if yellow_detected:
-            print("At least 50% of the image is Yellow: True")
-         else:
-            print("At least 50% of the image is Yellow: False")
+            speed1.set_duty_cycle(speed / 2.0) 
 
         #convert the ultrasonic numbers to inches
         front_distance = (us_front.distance - 0.01661) / 0.023205
-        back_distance  = (us_back.distance - 0.01661)  / 0.023205
-        if front_distance < 24.0 or back_distance < 24.0:
-            speed.set_duty_cycle(0.0) #automatic braking system
+        back_distance  = (us_back.distance -  0.01661) / 0.023205
+        if front_distance < 24.0:
+            speed1.set_duty_cycle(0.0) #automatic braking system
+        elif back_distance < 24.0:
+            speed2.set_duty_cycle(0.0) #automatic braking system
 
         #turn signals
         if turnSignal > 6 and turnSignal < 8.3:

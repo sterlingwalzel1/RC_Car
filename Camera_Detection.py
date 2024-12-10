@@ -3,28 +3,35 @@ import time
 import cv2
 import numpy as np
 
-def take_picture(filename="test.jpg"):
-    """
-    Captures an image from the camera and saves it to the specified filename.
-    Can be called from another script to take a picture.
-    """
-    # Initialize Picamera2
-    picam2 = Picamera2()
+def take_picture(filename="captured_image.jpg"):
+    try:
+        # Initialize Picamera2 object
+        picam2 = Picamera2()
 
-    # Create and configure camera preview configuration
-    camera_config = picam2.create_preview_configuration()
-    picam2.configure(camera_config)
+        # Allow time for the camera to initialize
+        time.sleep(2)
 
-    # Start the camera
-    picam2.start()
+        # Create and configure the camera preview configuration
+        camera_config = picam2.create_preview_configuration()
+        picam2.configure(camera_config)
 
-    # Wait for a moment to let the camera initialize
-    time.sleep(2)
+        # Start the camera
+        picam2.start()
 
-    # Capture an image
-    picam2.capture_file(filename)
+        # Capture the image and save it
+        picam2.capture_file(filename)
+        print(f"Image saved as {filename}")
 
-    print(f"Image saved as {filename}")
+        # Stop the camera after capturing the image to avoid it being in the Running state
+        picam2.stop()
+        print("Camera stopped successfully.")
+
+        # Explicitly release resources
+        picam2.close()
+        print("Camera resources released.")
+
+    except Exception as e:
+        print(f"An error occurred while capturing the image: {e}")
 
 def detect_red(image, threshold=0.5):
     """
