@@ -41,7 +41,9 @@ speed2 = GPIO.PWM(22, 1000)
 speed2.start(0)
 
 # Default light state
-light_state = 'LIGHT_OFF'
+light_state = ['LIGHT_OFF', 'LIGHT_ON']
+turnSignal = 8.5
+speed = 0
 
 # MQTT setup
 # this callback runs once when the client connects with the broker
@@ -56,22 +58,37 @@ def on_message(client, userdata, msg):
         act = float(msg.payload)
         print(act)
         
-        if (act > 100 and act < 1000) or (act > 1100 and act < 2000) or act > 2100 or act < 0:
-            print("Invalid value received.")
-        elif act <= 100:
-            act = (act / 16.67) + 6
-            turn.ChangeDutyCycle(act)
-            turnSignal = act
-        elif 1000 <= act <= 1100:
-            act = act % 1000
-            speed1.ChangeDutyCycle(act)
-            speed2.ChangeDutyCycle(0)
-            speed = act
-        elif 2000 <= act <= 2100:
-            act = act % 2000
+        if act == 'up':
+            if speed > 0:
+                if speed <= 80
+                speed += 4
+                speed1.ChangeDutyCycle(speed)
+            else:
+                speed1.ChangeDutyCycle(0)
+                speed += 4
+                speed2.ChangeDutyCycle(speed * -1)
+        elif act == 'down':
+            if speed > 0:
+                speed2.ChangeDutyCycle(0)
+                speed -= 4
+                speed1.ChangeDutyCycle(speed)
+            else:
+                speed1.ChangeDutyCycle(0)
+                if speed > -80
+                    speed -= 4
+                    speed2.ChangeDutyCycle(speed * -1)
+        elif act == 'left':
+            if 6 < turnSignal:
+                turnSignal -= 0.2
+                turn.ChangeDutyCycle(turnSignal)
+        elif act == 'right':
+            if 12 > turnSignal:
+                turnSignal += 0.2
+                turn.ChangeDutyCycle(turnSignal)
+        elif act == 'space':
             speed1.ChangeDutyCycle(0)
-            speed2.ChangeDutyCycle(act)
-            speed = act
+            speed2.ChangeDutyCycle(0)
+
     except ValueError:
         print("Received invalid data.")
 
@@ -110,27 +127,28 @@ try:
         #convert the ultrasonic numbers to inches
         front_distance = (us_front.distance - 0.01661) / 0.023205
         back_distance  = (us_back.distance -  0.01661) / 0.023205
-        if front_distance < 24.0:
+        if front_distance < 2.0:
             speed1.set_duty_cycle(0.0) # Can't go forwards anymore
-        elif back_distance < 24.0:
+        elif back_distance < 2.0:
             speed2.set_duty_cycle(0.0) # Can't go backwards anymore
 
-        if 6 < turnSignal < 8.3:
-            light_state = 'LIGHT_ON' if light_state == 'LIGHT_OFF' else 'LIGHT_OFF'
-            GPIO.output(leftFLED, light_state == 'LIGHT_ON')
-            GPIO.output(leftBLED, light_state == 'LIGHT_ON')
-        elif turnSignal > 8.7:
-            light_state = 'LIGHT_ON' if light_state == 'LIGHT_OFF' else 'LIGHT_OFF'
-            GPIO.output(rightFLED, light_state == 'LIGHT_ON')
-            GPIO.output(rightBLED, light_state == 'LIGHT_ON')
+        if 6 < turnSignal < 8.2:
+            GPIO.output(leftFLED,  True)
+            GPIO.output(leftBLED,  True)
+            GPIO.output(rightFLED, False)
+            GPIO.output(rightBLED, False)
+        elif turnSignal > 8.8:
+            GPIO.output(rightFLED, True)
+            GPIO.output(rightBLED, True)
+            GPIO.output(leftFLED,  False)
+            GPIO.output(leftBLED,  False)
         else:
-            light_state = 'LIGHT_OFF'
-            GPIO.output(leftFLED, False)
-            GPIO.output(leftBLED, False)
+            GPIO.output(leftFLED,  False)
+            GPIO.output(leftBLED,  False)
             GPIO.output(rightFLED, False)
             GPIO.output(rightBLED, False)
 
-        time.sleep(1)
+        time.sleep(0.01)
   
 except KeyboardInterrupt:
     print('Exiting due to KeyboardInterrupt...')
