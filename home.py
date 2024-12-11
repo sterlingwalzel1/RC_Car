@@ -26,8 +26,7 @@ def keyboard_input(stdscr):
     key = stdscr.getch()
     stdscr.refresh()
     stdscr.getch()
-
-
+    return key
 
 # read command line arguemnts
 numArgs = len(sys.argv)
@@ -42,19 +41,20 @@ client.connect("broker.emqx.io", 1883, 60)
 client.loop_start()
 
 
-try:
+def main(stdscr):
+    stdscr.clear()
+    count = 0
     while True:
-        key_pressed = curses.wrapper(keyboard_input)
+        if count % 3 == 0:
+            stdscr.clear()
+        stdscr.addstr("\nPress any key to continue...")
+        stdscr.refresh()
+        key_pressed = stdscr.getch()
+        stdscr.addstr(f"\nYou pressed: {int(key_pressed)}")
+        stdscr.refresh()
         client.publish(pub_topic_name, payload=key_pressed, qos=0, retain=False)
+        count += 1
         time.sleep(.1)
 
 
-
-except KeyboardInterrupt:
-    print('Got Keyboard Interrupt. Cleaning up and exiting')
-    led.set_duty_cycle(100.0)
-    GPIO.cleanup()
-    sys.exit()
-
-
-
+curses.wrapper(main)
