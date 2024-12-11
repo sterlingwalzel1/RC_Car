@@ -3,7 +3,7 @@ import sys
 import os
 sys.path.insert(0, '../utilities')
 import utilities
-#import keyboard
+import keyboard
 import paho.mqtt.client as mqtt
 import RPi.GPIO as GPIO
 
