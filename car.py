@@ -58,7 +58,7 @@ def on_message(client, userdata, msg):
         act = float(msg.payload)
         print(act)
         
-        if act == 'up':
+        if act == 259:
             if speed > 0:
                 if speed <= 80
                 speed += 4
@@ -67,7 +67,7 @@ def on_message(client, userdata, msg):
                 speed1.ChangeDutyCycle(0)
                 speed += 4
                 speed2.ChangeDutyCycle(speed * -1)
-        elif act == 'down':
+        elif act == 258:
             if speed > 0:
                 speed2.ChangeDutyCycle(0)
                 speed -= 4
@@ -77,15 +77,15 @@ def on_message(client, userdata, msg):
                 if speed > -80
                     speed -= 4
                     speed2.ChangeDutyCycle(speed * -1)
-        elif act == 'left':
+        elif act == 260:
             if 6 < turnSignal:
                 turnSignal -= 0.2
                 turn.ChangeDutyCycle(turnSignal)
-        elif act == 'right':
+        elif act == 261:
             if 12 > turnSignal:
                 turnSignal += 0.2
                 turn.ChangeDutyCycle(turnSignal)
-        elif act == 'space':
+        elif act == 32:
             speed1.ChangeDutyCycle(0)
             speed2.ChangeDutyCycle(0)
 

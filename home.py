@@ -3,7 +3,7 @@ import sys
 import os
 sys.path.insert(0, '../utilities')
 import utilities
-import keyboard
+import curses
 import paho.mqtt.client as mqtt
 import RPi.GPIO as GPIO
 
@@ -19,17 +19,14 @@ def on_message(client, userdata, msg):
     
 
 # Function to check and return valid key presses
-def get_key_input():
-    # Define the valid keys
-    valid_keys = ['up', 'down', 'left', 'right', 'space']
+def keyboard_input(stdscr):
+    stdscr.clear()
+    stdscr.addstr("Enter desired Turn or Speed: ")
+    stdscr.refresh()
+    key = stdscr.getch()
+    stdscr.refresh()
+    stdscr.getch()
 
-    # Check if any of the valid keys are pressed
-    for key in valid_keys:
-        if keyboard.is_pressed(key):
-            return key  # Return the key that was pressed
-
-    # If none of the valid keys are pressed, return None
-    return None
 
 
 # read command line arguemnts
@@ -47,14 +44,10 @@ client.loop_start()
 
 try:
     while True:
-        print("Enter desired Turn or Speed: ")
-        key_pressed = get_key_input()  # Get the key pressed, or None if no key is pressed
-        
-        if key_pressed:  # If a valid key was pressed, output the key
-            print(f"Key pressed: {key_pressed}")
-        
+        key_pressed = curses.wrapper(keyboard_input)
         client.publish(pub_topic_name, payload=key_pressed, qos=0, retain=False)
         time.sleep(.1)
+
 
 
 except KeyboardInterrupt:

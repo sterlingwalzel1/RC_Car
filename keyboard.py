@@ -1,13 +1,24 @@
-import keyboard
+import curses
 
-def get_key_input():
-    valid_keys = ['up', 'down', 'left', 'right', 'space']
-    for key in valid_keys:
-        if keyboard.is_pressed(key):
-            return key  # Return the key that was pressed
-    return None  # If no key is pressed, return None
+def fart(stdscr):
+    stdscr.clear()
+    stdscr.addstr("Press any key to continue...")
+    stdscr.refresh()
+    key = stdscr.getch()
+    stdscr.addstr(f"\nYou pressed: {int(key)}")
+    stdscr.refresh()
+    stdscr.getch()
+    return key
 
-while True:
-    key_pressed = get_key_input()
-    if key_pressed:
-        print(f"Key pressed: {key_pressed}")
+
+try:
+    while True:
+        i = curses.wrapper(fart)
+        print(i)
+
+
+except KeyboardInterrupt:
+    print('Got Keyboard Interript. Cleaning up an dexiting')
+    GPIO.output(LED_O_PIN, GPIO.LOW)
+    GPIO.cleanup()
+    sys.exit()
