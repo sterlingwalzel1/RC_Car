@@ -8,6 +8,9 @@ from gpiozero import DistanceSensor
 from Camera_Detection import take_picture, detect_red, detect_yellow
 import cv2
 
+# Reboot time
+time.sleep(60)
+
 # Set up LED pins
 leftFLED = 29
 leftBLED = 31
@@ -48,21 +51,19 @@ speed = 0
 # MQTT setup
 # this callback runs once when the client connects with the broker
 def on_connect(client, userdata, flags, rc):
-    print(f"Connected with result code {rc}")
+    print(f"Connected with result code {rc}", flush = True)
     client.subscribe(sub_topic_name)
 
 # this callback runs whenever a message is received
 def on_message(client, userdata, msg):
     global turnSignal, speed
     try:
-        act = float(msg.payload)
-        print(act)
-        
+        act = float(msg.payload)    
         if act == 259:
             if speed > 0:
-                if speed <= 80
-                speed += 4
-                speed1.ChangeDutyCycle(speed)
+                if speed <= 80:
+                    speed += 4
+                    speed1.ChangeDutyCycle(speed)
             else:
                 speed1.ChangeDutyCycle(0)
                 speed += 4
@@ -74,23 +75,24 @@ def on_message(client, userdata, msg):
                 speed1.ChangeDutyCycle(speed)
             else:
                 speed1.ChangeDutyCycle(0)
-                if speed > -80
+                if speed > -80:
                     speed -= 4
                     speed2.ChangeDutyCycle(speed * -1)
         elif act == 260:
-            if 6 < turnSignal:
-                turnSignal -= 0.2
+            if 6.5 < turnSignal:
+                turnSignal -= 0.4
                 turn.ChangeDutyCycle(turnSignal)
         elif act == 261:
-            if 12 > turnSignal:
-                turnSignal += 0.2
+            if 11.2 > turnSignal:
+                turnSignal += 0.4
                 turn.ChangeDutyCycle(turnSignal)
         elif act == 32:
+            speed = 0
             speed1.ChangeDutyCycle(0)
             speed2.ChangeDutyCycle(0)
 
     except ValueError:
-        print("Received invalid data.")
+        print("Received invalid data.", flush = True)
 
 
     
@@ -127,9 +129,11 @@ try:
         #convert the ultrasonic numbers to inches
         front_distance = (us_front.distance - 0.01661) / 0.023205
         back_distance  = (us_back.distance -  0.01661) / 0.023205
-        if front_distance < 2.0:
+        if front_distance < 12.0:
+            speed = 0
             speed1.set_duty_cycle(0.0) # Can't go forwards anymore
-        elif back_distance < 2.0:
+        elif back_distance < 12.0:
+            speed = 0
             speed2.set_duty_cycle(0.0) # Can't go backwards anymore
 
         if 6 < turnSignal < 8.2:
@@ -151,7 +155,7 @@ try:
         time.sleep(0.01)
   
 except KeyboardInterrupt:
-    print('Exiting due to KeyboardInterrupt...')
+    print('Exiting due to KeyboardInterrupt...', flush = True)
     turn.stop()
     speed1.stop()
     speed2.stop()
